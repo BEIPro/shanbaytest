@@ -1,26 +1,10 @@
 package spd.com.myapplication;
 
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
-import android.text.Selection;
-import android.text.Spannable;
-import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -88,6 +72,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onclick(View textView) {
 
+                TextView tv = (TextView) textView;
+                String s = tv
+                        .getText()
+                        .subSequence(tv.getSelectionStart(),
+                                tv.getSelectionEnd()).toString();
+
+                WordDetailsModel.getInstance().getWordDetails(textView.getContext(), s.trim());
             }
         });
 
