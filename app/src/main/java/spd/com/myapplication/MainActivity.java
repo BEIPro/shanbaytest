@@ -36,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
                 "concerns over the jailing of opposition leader Yulia Tymoshenko and bringing " +
                 "in" +
                 "reforms." +
-                "A senior EU official also made it clear the agreements would fall through if " +
-                "Ukrainejoined the Russia-led post-Soviet Customs Union trade bloc. \"We have a " +
+                "A senior EU official also made it clear that agreements would fall through if " +
+                "Ukrainejoined the Russia-led post-Soviet Customs Union trade bloc. We have a " +
                 "window of" +
-                "opportunity. But time is short,'' Stefan Fuele, the European Commissioner for" +
+                "opportunity. But time is short,'' Stefan Fuele, the European Commissioner for " +
                 "Enlargement and European Neighbourhood Policy, said on a visit to Ukraine." +
                 "Brussels put off signing the landmark agreements after a Ukrainian court jailed " +
                 "former" +
@@ -59,5 +59,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+
 
 }
