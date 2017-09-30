@@ -29,8 +29,8 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
 
     private int clickedX = -1;
     private int clickedY = -1;
-    private List<String[]> stringArrayList = new ArrayList<>();
-    private List<int[]> drawOffsetsList = new ArrayList<>();
+    private List<String[]> stringArrayList;
+    private List<int[]> drawOffsetsList;
     private SpanClickListener spanClickListener;
 
     interface SpanClickListener {
@@ -90,9 +90,15 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         int rowIndex = getPaddingTop();
         int colIndex = getPaddingLeft();
 
-        stringArrayList = divideOriginalTextToStringLineList();
-        drawOffsetsList = calculateDrawOffsets(paint, getWidth() - getPaddingLeft() -
-                getPaddingRight());
+        if (stringArrayList == null){
+            stringArrayList = divideOriginalTextToStringLineList();
+        }
+
+        if (drawOffsetsList == null){
+            drawOffsetsList = calculateDrawOffsets(paint, getWidth() - getPaddingLeft() -
+                    getPaddingRight());
+        }
+
 
         for (int i = 0; i < stringArrayList.size(); i ++){
             rowIndex += getLineHeight();
@@ -112,8 +118,8 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
                 } else {
                     //逐个通过drawText将单词画出来，横坐标加上对应的偏移量
                     //遇到被点击的单词切换颜色达到高亮效果
-                    colIndex += drawOffsetsList.get(stringArrayList.indexOf(stringArrayList.get(i)))[j - 1];
-                    if (stringArrayList.indexOf(stringArrayList.get(i)) == clickedY && j == clickedX){
+                    colIndex += drawOffsetsList.get(i)[j - 1];
+                    if (i == clickedY && j == clickedX){
                         canvas.drawText(" ", colIndex, rowIndex, paint);
                         colIndex += paint.measureText(" ");
 
