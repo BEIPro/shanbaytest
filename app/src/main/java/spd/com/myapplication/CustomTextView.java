@@ -11,7 +11,6 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -31,7 +30,15 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
     private int clickedY = -1;
     private List<String[]> stringArrayList = new ArrayList<>();
     private List<int[]> drawOffsetsList = new ArrayList<>();
+    private SpanClickListener spanClickListener;
 
+    interface SpanClickListener {
+        void onclick(View textView);
+    }
+
+    public void setSpanClickListener(SpanClickListener spanClickListener){
+        this.spanClickListener = spanClickListener;
+    }
 
     public CustomTextView(Context context) {
         super(context);
@@ -125,11 +132,17 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
             ClickableSpan clickSpan = new ClickableSpan(){
                 @Override
                 public void onClick(View widget) {
-                    TextView tv = (TextView) widget;
-                    String s = tv
-                            .getText()
-                            .subSequence(tv.getSelectionStart(),
-                                    tv.getSelectionEnd()).toString();
+                    if (spanClickListener != null){
+                        spanClickListener.onclick(widget);
+                    }else {
+                        TextView tv = (TextView) widget;
+                        String s = tv
+                                .getText()
+                                .subSequence(tv.getSelectionStart(),
+                                        tv.getSelectionEnd()).toString();
+                        Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                    }
+
                 }
             };
             // to cater last/only word
