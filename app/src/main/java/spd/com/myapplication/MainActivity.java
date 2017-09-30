@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 "bloc's" +
                 "concerns over the jailing of opposition leader Yulia Tymoshenko and bringing " +
                 "in" +
-                "reforms." +
+                "reforms.\n " +
                 "A senior EU official also made it clear that agreements would fall through if " +
                 "Ukrainejoined the Russia-led post-Soviet Customs Union trade bloc. We have a " +
                 "window of" +

@@ -8,6 +8,7 @@ import android.text.Layout;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
@@ -64,16 +65,24 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         super.setText(text, type);
 
         if (type == BufferType.SPANNABLE){
-            getEachWord(this);
+            setEachWordSpan(this);
         }
     }
 
-    public void clearHighlight(){
+    private void clearClickedXY(){
         clickedX = -1;
         clickedY = -1;
+    }
+
+    public void clearHighlight(){
+        clearClickedXY();
         postInvalidate();
     }
 
+    /*重写onDraw方法，将单词逐个用drawText画出来
+     *计算得出每一行两边对齐所缺少的空隙长度，然后将该长度平均分配到单词中间
+     *在对单词进行drawText的时候将对应的偏移量加到横坐标上达到两边对齐的效果
+     */
     @Override
     protected void onDraw(Canvas canvas) {
 
@@ -92,6 +101,7 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
             for (int j = 0; j < stringArrayList.get(i).length; j++){
                 paint.setColor(Color.BLACK);
 
+                //首个单词不需要偏移
                 if (j == 0){
                     if (i == clickedY && j == clickedX) {
                         paint.setColor(Color.GREEN);
@@ -99,7 +109,9 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
                     canvas.drawText(stringArrayList.get(i)[j], colIndex, rowIndex, paint);
                     colIndex += paint.measureText(stringArrayList.get(i)[j]);
 
-                }else {
+                } else {
+                    //逐个通过drawText将单词画出来，横坐标加上对应的偏移量
+                    //遇到被点击的单词切换颜色达到高亮效果
                     colIndex += drawOffsetsList.get(stringArrayList.indexOf(stringArrayList.get(i)))[j - 1];
                     if (stringArrayList.indexOf(stringArrayList.get(i)) == clickedY && j == clickedX){
                         canvas.drawText(" ", colIndex, rowIndex, paint);
@@ -121,13 +133,14 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
     }
 
 
-    private void getEachWord(TextView textView){
+    /*根据空格的位置对文本进行拆分，将每个单词设置成clickSpan
+     */
+    private void setEachWordSpan(TextView textView){
         Spannable spans = (Spannable)textView.getText();
         Integer[] indices = getIndices(
                 textView.getText().toString().trim(), ' ');
         int start = 0;
         int end = 0;
-        // to cater last/only word loop will run equal to the length of indices.length
         for (int i = 0; i <= indices.length; i++) {
             ClickableSpan clickSpan = new ClickableSpan(){
                 @Override
@@ -145,7 +158,8 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
 
                 }
             };
-            // to cater last/only word
+
+            //最后一个单词结尾可能没有空格，按照文本长度计算位置
             end = (i < indices.length ? indices[i] : spans.toString().trim().length());
             spans.setSpan(clickSpan, start, end,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -153,6 +167,11 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         }
     }
 
+
+    /*返回字符c在字符串s中的序号数组
+     *
+     * @return 序号数组
+     */
     private Integer[] getIndices(String s, char c) {
         int pos = s.indexOf(c, 0);
         List<Integer> indices = new ArrayList<Integer>();
@@ -162,6 +181,7 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         }
         return (Integer[]) indices.toArray(new Integer[0]);
     }
+
 
     private class LinkTouchMovementMethod extends LinkMovementMethod {
         private ClickableSpan mPressedSpan;
@@ -181,9 +201,10 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
                 ClickableSpan touchedSpan = getPressedSpan(textView, spannable, event);
 
                 if (touchedSpan == null){
-                    clearHighlight();
+                    clearClickedXY();
                 }
 
+                //action_up的时候判断点击位置是否发生了移动
                 if (mPressedSpan != null && touchedSpan == mPressedSpan) {
                     Selection.setSelection(spannable, spannable.getSpanStart(mPressedSpan),
                             spannable.getSpanEnd(mPressedSpan));
@@ -216,25 +237,39 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
 
         Layout layout = textView.getLayout();
         int line = layout.getLineForVertical(y);
+        int totalOffset = getXDrawOffset(x, line);
 
         //x轴偏移量为-1则代表点击到了空白处 返回null
-        if (getXDrawOffset(x, line) == -1){
+        if (totalOffset == -1){
             return null;
         }
 
+        //计算单词的在整个字符串中的序号时要去除onDraw中添加的偏移量
         int off = layout.getOffsetForHorizontal(line, x - getXDrawOffset(x, line));
 
         ClickableSpan[] link = spannable.getSpans(off, off, ClickableSpan.class);
         ClickableSpan clickableSpan = null;
         if (link.length > 0) {
             clickableSpan = link[0];
-            //提前设置好被点击的span在字串表 {stringArrayList} 里的对应下标
-            clickedY = line;
-            clickedX = getIndexXFromOffset(x - getXDrawOffset(x, line), line);
+
+            if (event.getAction() == MotionEvent.ACTION_UP){
+                //提前设置好被点击的span在字串表 {stringArrayList} 里的对应下标
+                clickedY = line;
+                clickedX = getIndexXFromOffset(x, line);
+            }else {
+                //避免action down事件中触发on draw出现高亮
+                clearClickedXY();
+            }
+
         }
         return clickableSpan;
     }
 
+    /**
+     * 根据textview自身换行策略将文本内容按照每行拆分为多个字符数组
+     *
+     * @return 每一行字符数组组成的list
+     */
     private List<String[]> divideOriginalTextToStringLineList (){
         List<String[]> stringArrayList=new ArrayList<>();
         String line;
@@ -243,7 +278,7 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         String text = getText().toString();
         int start=0;
         int end;
-        for (int i=0; i<getLineCount(); i++) {
+        for (int i = 0; i < getLineCount(); i++) {
             end = layout.getLineEnd(i);
             line = text.substring(start,end);
             stringArrayList.add(line.split(" "));
@@ -252,25 +287,40 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         return stringArrayList;
     }
 
+    /**
+     * 计算出每行文本两边对齐需要填充的空隙长度，将长度存于数组中，每行对应一个数组
+     *
+     * @param textPaint 画笔，用于计算单词的长度
+     * @param textWidth　TextView的去除padding的宽度
+     * @return 用于保存空隙长度的数组的list
+     */
     private List<int[]> calculateDrawOffsets(TextPaint textPaint, int textWidth){
 
         List<int[]> list = new ArrayList<>();
 
         for (String[] strings : stringArrayList){
-            String line = "";
-            for (String s : strings){
-                if ( Arrays.asList(strings).indexOf(s) != strings.length-1){
-                    line = line + s + " ";
-                }else {
-                    line = line + s;
-                }
-            }
+
 
             int[] spaceArray;
-            if (strings.length == 1){
-                spaceArray = new int[]{-1};
-            }else {
-                spaceArray = new int[strings.length -1];
+            spaceArray = new int[strings.length -1];
+
+            //如果是段落最后一行（按照'\n'进行判断）或者最后一行，不需要两边对齐
+            String lastString = strings[strings.length - 1];
+            if (TextUtils.equals(lastString.substring(lastString.length() - 1), "\n") ||
+                    stringArrayList.indexOf(strings) == stringArrayList.size() - 1) {
+                for (int i = 0; i < spaceArray.length; i++){
+                    spaceArray[i] = 0;
+                }
+            } else {
+
+                String line = "";
+                for (String s : strings){
+                    if ( Arrays.asList(strings).indexOf(s) != strings.length-1){
+                        line = line + s + " ";
+                    }else {
+                        line = line + s;
+                    }
+                }
 
                 int quotient = (textWidth - Math.round(textPaint.measureText(line))) / (strings.length - 1);
                 int remainder = (textWidth - Math.round(textPaint.measureText(line))) % (strings.length - 1) ;
@@ -292,14 +342,22 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         return list;
     }
 
+    /**
+     * 获取被点击单词在行中的序列号
+     *
+     * @param x 点击位置的横坐标
+     * @param line　点击位置列号
+     * @return 被点击单词在行中的序列号
+     */
     private int getIndexXFromOffset(int x, int line){
 
+        int actualX = x - getXDrawOffset(x, line);
         int indexX = 0;
         String[] strings = stringArrayList.get(line);
         TextPaint textPaint = getPaint();
 
         for (String string : strings) {
-            if ((x -= (textPaint.measureText(string) + textPaint.measureText(" "))) > 0) {
+            if ((actualX -= (textPaint.measureText(string) + textPaint.measureText(" "))) > 0) {
                 indexX++;
             } else {
                 break;
@@ -309,22 +367,30 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         return indexX;
     }
 
+
+    /**
+     * 获取被点击位置对应单词在onDraw中被添加的偏移量之和
+     *
+     * @param x 点击位置的横坐标
+     * @param line　点击位置列号
+     * @return 偏移量之和
+     */
     private int getXDrawOffset(int x, int line){
         int offset = 0;
         String[] strings = stringArrayList.get(line);
         int[] offsets = drawOffsetsList.get(line);
 
         for (int i = 0; i < strings.length - 1; i++){
-            if ((x -= getPaint().measureText(strings[i])) > 0){
-                if (offsets[i] == -1 || (x -= getPaint().measureText(" ")) < 0){
-                    offset = -1;
-                    continue;
-                }
 
-                if (( x -= offsets[i]) > 0){
-                    offset += offsets[i];
-                }else {
+            if ((x -= getPaint().measureText(strings[i])) > 0){
+
+                //去除一个单词的长度之后若剩余长度小于偏移量加一个空格的长度之和则说明点到了空白
+                //返回-1
+                if ((x -= (getPaint().measureText(" ") + offsets[i])) < 0){
                     offset = -1;
+                    break;
+                }else {
+                    offset += offsets[i];
                 }
             }else {
                 break;
