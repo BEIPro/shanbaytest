@@ -190,7 +190,7 @@ public class WordDetailsDialogHelper {
         public void slidIn(){
             addView();
             ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(rootView, "translationY", rootView.getHeight(), 0);
-            objectAnimator.setDuration(500);
+            objectAnimator.setDuration(300);
             objectAnimator.start();
         }
 
@@ -218,7 +218,7 @@ public class WordDetailsDialogHelper {
 
                 }
             });
-            objectAnimator.setDuration(500);
+            objectAnimator.setDuration(300);
             objectAnimator.start();
         }
     }

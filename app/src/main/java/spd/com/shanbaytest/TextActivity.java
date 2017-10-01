@@ -15,7 +15,7 @@ public class TextActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.text_activity);
 
         final String text = "KIEV — The European Union warned Ukraine on Thursday time was running out to " +
                 "revive shelved deals on free trade and political association by meeting the bloc's " +
@@ -64,13 +64,6 @@ public class TextActivity extends AppCompatActivity {
         final CustomTextView textView = (CustomTextView) findViewById(R.id.text);
         Log.w("ok", "text size = " + textView.getPaint().getTextSize());
         textView.setText(text, TextView.BufferType.SPANNABLE);
-
-        findViewById(R.id.ok).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                textView.clearHighlight();
-            }
-        });
 
         final WordDetailsDialogHelper.DetailsDialog detailsDialog = WordDetailsDialogHelper
                 .buildDialog(this.getApplicationContext());
