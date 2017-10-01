@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="spd.com.myapplication.MainActivity">
+    tools:context="spd.com.myapplication.spd.com.shanbaytest.TextActivity">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +17,7 @@
             android:layout_marginBottom="20dp"
             android:id="@+id/ok"/>
 
-        <spd.com.myapplication.CustomTextView
+        <spd.com.shanbaytest.widget.CustomTextView
             android:padding="24dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

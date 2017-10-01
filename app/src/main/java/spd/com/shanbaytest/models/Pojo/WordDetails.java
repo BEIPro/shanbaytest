@@ -1,4 +1,4 @@
-package spd.com.myapplication;
+package spd.com.shanbaytest.models.Pojo;
 
 /**
  * Created by linus on 17-10-1.
@@ -7,6 +7,24 @@ package spd.com.myapplication;
 public class WordDetails {
 
     private Data data;
+    private String msg;
+    private int status_code;
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public int getStatus_code() {
+        return status_code;
+    }
+
+    public void setStatus_code(int status_code) {
+        this.status_code = status_code;
+    }
 
     public Data getData() {
         return data;
@@ -16,7 +34,7 @@ public class WordDetails {
         this.data = data;
     }
 
-    class Data {
+    public class Data {
         private String audio;
         private String pronunciation;
         private String definition;

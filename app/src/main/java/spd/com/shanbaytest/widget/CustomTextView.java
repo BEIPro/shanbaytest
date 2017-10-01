@@ -1,4 +1,4 @@
-package spd.com.myapplication;
+package spd.com.shanbaytest.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -33,8 +33,8 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
     private List<int[]> drawOffsetsList;
     private SpanClickListener spanClickListener;
 
-    interface SpanClickListener {
-        void onclick(View textView);
+    public interface SpanClickListener {
+        void onclick(View textView, boolean clickSpace);
     }
 
     public void setSpanClickListener(SpanClickListener spanClickListener){
@@ -152,7 +152,7 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
                 @Override
                 public void onClick(View widget) {
                     if (spanClickListener != null){
-                        spanClickListener.onclick(widget);
+                        spanClickListener.onclick(widget, false);
                     }else {
                         TextView tv = (TextView) widget;
                         String s = tv
@@ -207,7 +207,11 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
                 ClickableSpan touchedSpan = getPressedSpan(textView, spannable, event);
 
                 if (touchedSpan == null){
-                    clearClickedXY();
+                    clearHighlight();
+
+                    if (spanClickListener != null){
+                        spanClickListener.onclick(textView, true);
+                    }
                 }
 
                 //action_up的时候判断点击位置是否发生了移动
@@ -215,7 +219,7 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
                     Selection.setSelection(spannable, spannable.getSpanStart(mPressedSpan),
                             spannable.getSpanEnd(mPressedSpan));
                     lastSpannable = spannable;
-                    mPressedSpan.onClick(textView);
+                    touchedSpan.onClick(textView);
                 }
             }else if (event.getAction() == MotionEvent.ACTION_CANCEL){
                 super.onTouchEvent(textView, spannable, event);
@@ -245,7 +249,7 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         int line = layout.getLineForVertical(y);
         int totalOffset = getXDrawOffset(x, line);
 
-        //x轴偏移量为-1则代表点击到了空白处 返回null
+        //getXDrawOffset返回-1则代表点击到了空白处 返回null
         if (totalOffset == -1){
             return null;
         }

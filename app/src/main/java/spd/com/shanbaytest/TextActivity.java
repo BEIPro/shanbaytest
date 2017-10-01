@@ -1,4 +1,4 @@
-package spd.com.myapplication;
+package spd.com.shanbaytest;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -6,7 +6,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import spd.com.myapplication.R;
+import spd.com.shanbaytest.models.WordDetailsDialogHelper;
+import spd.com.shanbaytest.widget.CustomTextView;
+
+public class TextActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,22 +72,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final WordDetailsDialogHelper.DetailsDialog detailsDialog = WordDetailsDialogHelper
+                .buildDialog(this.getApplicationContext());
+
         textView.setSpanClickListener(new CustomTextView.SpanClickListener() {
             @Override
-            public void onclick(View textView) {
+            public void onclick(View textView, boolean clickSpace) {
 
-                TextView tv = (TextView) textView;
-                String s = tv
-                        .getText()
-                        .subSequence(tv.getSelectionStart(),
-                                tv.getSelectionEnd()).toString();
-
-                WordDetailsModel.getInstance().getWordDetails(textView.getContext(), s.trim());
+                if (clickSpace){
+                    detailsDialog.slidOut();
+                }else {
+                    TextView tv = (TextView) textView;
+                    String s = tv
+                            .getText()
+                            .subSequence(tv.getSelectionStart(),
+                                    tv.getSelectionEnd()).toString();
+                    detailsDialog.loadWordDetails(s);
+                }
             }
         });
 
     }
-
 
 
 }

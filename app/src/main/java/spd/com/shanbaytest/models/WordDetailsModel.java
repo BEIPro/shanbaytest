@@ -1,7 +1,6 @@
-package spd.com.myapplication;
+package spd.com.shanbaytest.models;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -12,6 +11,8 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import spd.com.shanbaytest.models.Pojo.WordDetails;
+
 /**
  * Created by linus on 17-9-30.
  */
@@ -19,6 +20,12 @@ import org.json.JSONObject;
 public class WordDetailsModel {
 
     private static WordDetailsModel instance;
+
+    public interface GetDetailsListener{
+
+        void success(WordDetails wordDetails);
+        void fail(Object fail);
+    }
 
     private WordDetailsModel(){
 
@@ -32,11 +39,12 @@ public class WordDetailsModel {
         return instance;
     }
 
-    WordDetails getWordDetails(Context context, String word){
+    /*加载word details并通过gson进行解析
+     */
+    public void getWordDetails(Context context, String word, final GetDetailsListener listener){
 
         String url = "https://api.shanbay.com/bdc/search/?word=" + word;
 
-        final WordDetails[] wordDetails = new WordDetails[1];
         final Gson gson = new Gson();
         final RequestQueue requestQueue = Volley.newRequestQueue(context);
 
@@ -44,20 +52,17 @@ public class WordDetailsModel {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.w("TAG", response.toString());
-                        wordDetails[0] = gson.fromJson(response.toString(), WordDetails.class);
-                        Log.w("TAG", wordDetails[0].toString());
+                        WordDetails wordDetails = gson.fromJson(response.toString(), WordDetails.class);
+                        listener.success(wordDetails);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("TAG", error.getMessage(), error);
+                listener.fail(error);
             }
         });
 
         requestQueue.add(jsonObjectRequest);
-
-        return wordDetails[0];
     }
 
 }
