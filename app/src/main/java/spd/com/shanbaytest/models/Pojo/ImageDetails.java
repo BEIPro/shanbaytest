@@ -6,8 +6,8 @@ package spd.com.shanbaytest.models.Pojo;
 
 public class ImageDetails {
 
-    String url;
-    String localUrl;
+    private String url;
+    private String localPath;
 
     public String getUrl() {
         return url;
@@ -17,11 +17,11 @@ public class ImageDetails {
         this.url = url;
     }
 
-    public String getLocalUrl() {
-        return localUrl;
+    public String getLocalPath() {
+        return localPath;
     }
 
-    public void setLocalUrl(String localUrl) {
-        this.localUrl = localUrl;
+    public void setLocalPath(String localPath) {
+        this.localPath = localPath;
     }
 }

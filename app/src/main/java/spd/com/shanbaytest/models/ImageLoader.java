@@ -14,8 +14,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.ResponseBody;
@@ -30,7 +28,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import spd.com.myapplication.R;
-import spd.com.shanbaytest.Utils.FIleUtils;
+import spd.com.shanbaytest.Utils.FileUtils;
 import spd.com.shanbaytest.models.Pojo.ImageDetails;
 
 /**
@@ -43,18 +41,18 @@ public class ImageLoader {
 
     }
 
-    List<String> noRetryList = new ArrayList<>();
-
     public static ImageLoader newInstance() {
 
         return new ImageLoader();
     }
+    /**
+     * 通过glide先试图本地图片加载
+     * 本地没有则通过网络下载
+     */
+    public void loadImage(final ImageDetails imageDetails, final ImageView imageView) {
 
-    public void loadImage(final ImageDetails imageDetails, final ImageView imageView){
-
-        Glide.with(imageView.getContext()).load(imageDetails.getLocalUrl()).override(400, 720).listener(new RequestListener<String, GlideDrawable>() {
-
-
+        Glide.with(imageView.getContext()).load(imageDetails.getLocalPath()).override(400, 720)
+                .listener(new RequestListener<String, GlideDrawable>() {
             @Override
             public boolean onException(Exception e, String model, Target<GlideDrawable> target,
                                        boolean isFirstResource) {
@@ -64,26 +62,37 @@ public class ImageLoader {
 
             @Override
             public boolean onResourceReady(GlideDrawable resource, String model,
-                                           Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                           Target<GlideDrawable> target, boolean
+                                                   isFromMemoryCache, boolean isFirstResource) {
                 return false;
             }
         }).into(imageView);
 
     }
 
-    private void loadImageFromNetwork(final ImageDetails imageDetails, final ImageView imageView){
+    /**
+     * 通过RxJava配合retrofit进行下载以及重试
+     * 通过glide进行图片压缩显示
+     *
+     * @param imageDetails 图片相关信息，包含本地存储路径和网络获取url
+     * @param imageView　用于更新的imageView
+     */
+    private void loadImageFromNetwork(final ImageDetails imageDetails, final ImageView imageView) {
         String[] strings = imageDetails.getUrl().split("/");
-        final String fileName = strings[strings.length -1];
+        final String fileName = strings[strings.length - 1];
         Log.w("ok", "filename = " + fileName);
         getService().downloadPicFromNet(fileName).subscribeOn(Schedulers.newThread())
+                //重试3次，时间为1000ms,2000ms,3000ms
                 .retryWhen(new RetryWithDelay(3, 1000))
                 .map(new Func1<ResponseBody, Boolean>() {
                     @Override
                     public Boolean call(ResponseBody responseBody) {
                         Log.w("ok", "download response");
-                        Boolean writeSuccess = writeResponseBodyToDisk(imageView.getContext(), responseBody, imageDetails.getUrl());
-                        if (writeSuccess){
-                            imageDetails.setLocalUrl(FIleUtils.getImgLocalPath(imageDetails.getUrl(), imageView.getContext()));
+                        Boolean writeSuccess = writeResponseBodyToDisk(imageView.getContext(),
+                                responseBody, imageDetails.getUrl());
+                        if (writeSuccess) {
+                            imageDetails.setLocalPath(FileUtils.getImgLocalPath(imageDetails
+                                    .getUrl(), imageView.getContext()));
                         }
                         return writeSuccess;
                     }
@@ -106,26 +115,30 @@ public class ImageLoader {
 
                     @Override
                     public void onNext(Boolean writeSuccess) {
-                        Log.w("ok", "download response success");
                         Log.w("ok", "writeSuccess = " + writeSuccess);
-                            Glide.with(imageView.getContext()).load(imageDetails.getLocalUrl()).override(400, 720).error(R.mipmap
-                                    .f82e4bbb12978195797a3447d80f50ff).listener(new RequestListener<String, GlideDrawable>() {
+                        Glide.with(imageView.getContext()).load(imageDetails.getLocalPath())
+                                .override(400, 720).error(R.mipmap
+                                .f82e4bbb12978195797a3447d80f50ff).listener(new RequestListener<String, GlideDrawable>() {
 
 
-                                @Override
-                                public boolean onException(Exception e, String model,
-                                                           Target<GlideDrawable> target, boolean isFirstResource) {
-                                    e.printStackTrace();
-                                    Log.w("ok", "glide onException");
-                                    return false;
-                                }
+                            @Override
+                            public boolean onException(Exception e, String model,
+                                                       Target<GlideDrawable> target, boolean
+                                                               isFirstResource) {
+                                e.printStackTrace();
+                                Log.w("ok", "glide onException");
+                                return false;
+                            }
 
-                                @Override
-                                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                    Log.w("ok", "glide onResourceReady");
-                                    return false;
-                                }
-                            }).override(400, 720).into(imageView);
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model,
+                                                           Target<GlideDrawable> target, boolean
+                                                                   isFromMemoryCache, boolean
+                                                                   isFirstResource) {
+                                Log.w("ok", "glide onResourceReady");
+                                return false;
+                            }
+                        }).override(400, 720).into(imageView);
                     }
                 });
     }
@@ -137,6 +150,9 @@ public class ImageLoader {
         Observable<ResponseBody> downloadPicFromNet(@Path("id") String id);
     }
 
+    /**
+     * 创建retrofit服务，添加rxJava适配器
+     */
     private ServiceApi getService(){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://static.baydn.com/media/media_store/image/")
@@ -145,9 +161,12 @@ public class ImageLoader {
         return retrofit.create(ServiceApi.class);
     }
 
+    /**
+     * 将retrofit获取的response写到本地sd卡
+     */
     private boolean writeResponseBodyToDisk(Context context, ResponseBody body, String url) {
         try {
-            String localDirString = FIleUtils.getImgLocalDir(context);
+            String localDirString = FileUtils.getImgLocalDir(context);
             if (localDirString == null){
                 return false;
             }
@@ -158,7 +177,7 @@ public class ImageLoader {
             }
 
             // todo change the file location/name according to your needs
-            String localUrl = FIleUtils.getImgLocalPath(url, context);
+            String localUrl = FileUtils.getImgLocalPath(url, context);
             if (localUrl == null){
                 return false;
             }
@@ -171,9 +190,6 @@ public class ImageLoader {
             try {
                 byte[] fileReader = new byte[4096];
 
-                long fileSize = body.contentLength();
-                long fileSizeDownloaded = 0;
-
                 inputStream = body.byteStream();
                 outputStream = new FileOutputStream(futureStudioIconFile);
 
@@ -185,10 +201,6 @@ public class ImageLoader {
                     }
 
                     outputStream.write(fileReader, 0, read);
-
-                    fileSizeDownloaded += read;
-
-
                 }
 
                 outputStream.flush();
@@ -212,6 +224,11 @@ public class ImageLoader {
         }
     }
 
+    /**
+     * RxJava重试
+     * 构造的时候传入重试次数
+     * 每次重试时间随次数同比例增长　　
+     */
     private class RetryWithDelay implements
             Func1<Observable<? extends Throwable>, Observable<?>> {
 
@@ -219,7 +236,7 @@ public class ImageLoader {
         private final int retryDelayMillis;
         private int retryCount;
 
-        public RetryWithDelay(int maxRetries, int retryDelayMillis) {
+        RetryWithDelay(int maxRetries, int retryDelayMillis) {
             this.maxRetries = maxRetries;
             this.retryDelayMillis = retryDelayMillis;
         }

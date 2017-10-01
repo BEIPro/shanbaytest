@@ -6,8 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-
 import java.util.List;
 
 import spd.com.myapplication.R;
@@ -21,7 +19,7 @@ import spd.com.shanbaytest.models.Pojo.ImageDetails;
 public class GalleryRecycleViewAdapter extends RecyclerView.Adapter{
 
     private List<ImageDetails> imageDetailsList;
-    ImageLoader imageLoader;
+    private ImageLoader imageLoader;
 
 
     public GalleryRecycleViewAdapter(List<ImageDetails> imageDetailsList) {
@@ -33,7 +31,6 @@ public class GalleryRecycleViewAdapter extends RecyclerView.Adapter{
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_item, parent, false);
-
         return new ItemViewHolder(rootView);
     }
 
@@ -42,7 +39,6 @@ public class GalleryRecycleViewAdapter extends RecyclerView.Adapter{
         if (holder instanceof ItemViewHolder){
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             imageLoader.loadImage(imageDetailsList.get(position), itemViewHolder.imageView);
-//            Glide.with(((ItemViewHolder) holder).imageView.getContext()).load(R.mipmap.ic_launcher).into(((ItemViewHolder) holder).imageView);
         }
     }
 

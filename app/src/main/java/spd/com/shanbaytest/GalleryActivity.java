@@ -4,7 +4,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -15,7 +14,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.List;
 
 import spd.com.myapplication.R;
-import spd.com.shanbaytest.Utils.FIleUtils;
+import spd.com.shanbaytest.Utils.FileUtils;
 import spd.com.shanbaytest.models.Pojo.ImageDetails;
 import spd.com.shanbaytest.widget.GalleryRecycleViewAdapter;
 
@@ -44,11 +43,11 @@ public class GalleryActivity extends AppCompatActivity {
         Gson gson = new Gson();
         list = gson.fromJson(json , new TypeToken<List<ImageDetails>>() {}.getType());
 
-
+        //每次进入activity初始化图片加载列表，判断本地是否有对应已经下载好的图片
         for (ImageDetails imageDetails : list){
 
-            if (FIleUtils.isFileExists(FIleUtils.getImgLocalPath(imageDetails.getUrl(), this))){
-                imageDetails.setLocalUrl(FIleUtils.getImgLocalPath(imageDetails.getUrl(), this));
+            if (FileUtils.isFileExists(FileUtils.getImgLocalPath(imageDetails.getUrl(), this))){
+                imageDetails.setLocalPath(FileUtils.getImgLocalPath(imageDetails.getUrl(), this));
             }
         }
 
@@ -69,7 +68,7 @@ public class GalleryActivity extends AppCompatActivity {
     private static class SpacesItemDecoration extends RecyclerView.ItemDecoration {
         private final int space;
 
-        public SpacesItemDecoration(int space) {
+        SpacesItemDecoration(int space) {
             this.space = space;
         }
 

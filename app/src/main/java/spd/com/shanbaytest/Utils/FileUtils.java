@@ -9,7 +9,7 @@ import java.io.File;
  * Created by linus on 17-10-2.
  */
 
-public class FIleUtils {
+public class FileUtils {
 
     public static String getImgLocalPath(String url, Context context){
         String[] urlStrings = url.split("/");
@@ -27,7 +27,6 @@ public class FIleUtils {
     }
 
     public static boolean isFileExists(String url){
-        Log.w("ok", url + "exists = " + new File(url).exists());
         return new File(url).exists();
     }
 
