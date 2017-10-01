@@ -32,5 +32,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         galleryButton = (Button) findViewById(R.id.gallery_activity);
+        galleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(v.getContext(), GalleryActivity.class));
+            }
+        });
     }
 }
