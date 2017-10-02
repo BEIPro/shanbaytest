@@ -179,6 +179,7 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
      * @return 序号数组
      */
     private Integer[] getIndices(String s, char c) {
+        s.replace("\n", " ");
         int pos = s.indexOf(c, 0);
         List<Integer> indices = new ArrayList<Integer>();
         while (pos != -1) {

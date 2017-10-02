@@ -119,12 +119,15 @@ public class WordDetailsDialogHelper {
             if (wordDetails.getStatus_code() == 1){
                 msg.setVisibility(View.VISIBLE);
                 msg.setText(wordDetails.getMsg());
+                pronunciation.setVisibility(View.INVISIBLE);
             }else {
                 msg.setVisibility(View.INVISIBLE);
+                pronunciation.setVisibility(View.VISIBLE);
+                pronunciation.setText(wordDetails.getData().getPronunciation());
             }
 
             content.setText(wordDetails.getData().getContent());
-            pronunciation.setText(wordDetails.getData().getPronunciation());
+
             definition.setText(wordDetails.getData().getDefinition());
 
             pronunciation.setOnClickListener(new View.OnClickListener() {

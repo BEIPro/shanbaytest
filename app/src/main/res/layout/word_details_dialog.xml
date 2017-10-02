@@ -2,43 +2,54 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/dialogBGColor"
-                android:padding="16dp">
+                android:background="@color/dialogBGColor">
 
     <View
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="@color/colorAccent"
+        android:background="@color/touchSpace"
         android:id="@+id/touch_space">
 
     </View>
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_height="40dp"
+        android:src="@mipmap/drawer"
+        android:scaleType="centerInside">
+
+    </ImageView>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/touch_space"
         android:id="@+id/content"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/primaryTextColor"
         android:textSize="16sp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:textColor="@color/primaryTextColor"
         android:layout_below="@id/content"
-        android:layout_marginTop="12dp"
-        android:textColor="@color/colorPrimary"
+        android:drawableLeft="@mipmap/speaker"
+        android:layout_marginTop="16dp"
         android:id="@+id/pronunciation"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:textColor="@color/primaryTextColor"
         android:layout_marginTop="16dp"
         android:layout_below="@id/pronunciation"
-        android:textSize="16dp"
-        android:textColor="@color/colorPrimary"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp"
         android:id="@+id/definition"/>
 
     <ProgressBar
@@ -50,8 +61,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorPrimaryDark"
         android:layout_centerInParent="true"
+        android:textColor="@color/primaryTextColor"
         android:id="@+id/msg"
         android:visibility="invisible"/>
 
