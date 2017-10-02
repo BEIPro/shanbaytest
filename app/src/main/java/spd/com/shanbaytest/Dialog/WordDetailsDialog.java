@@ -7,16 +7,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
-import android.os.Build;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -37,10 +32,11 @@ import spd.com.shanbaytest.models.WordDetailsModel;
 public class WordDetailsDialog {
     private static final String SYSTEM_DIALOG_REASON_KEY = "reason";
     private static final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
+    private static final String SYSTEM_DIALOG_REASON_RECENT_APPS = "recentapps";
 
     private Context context;
     private View rootView;
-    private WindowManager windowManager;
+    private RelativeLayout mainDetails;
     private ProgressBar progressBar;
     private TextView pronunciation;
     private TextView content;
@@ -61,7 +57,6 @@ public class WordDetailsDialog {
     private WordDetailsDialog(Context context, final View rootView) {
         this.context = context;
         this.rootView = rootView;
-        windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         content = (TextView) rootView.findViewById(R.id.content);
         msg = (TextView) rootView.findViewById(R.id.msg);
         pronunciation = (TextView) rootView.findViewById(R.id.pronunciation);
@@ -69,6 +64,7 @@ public class WordDetailsDialog {
         progressBar = (ProgressBar) rootView.findViewById(R.id.prograss_bar);
         touchView = rootView.findViewById(R.id.touch_space);
         contentView = (ViewGroup) ((Activity)context).findViewById(android.R.id.content);
+        mainDetails = (RelativeLayout) rootView.findViewById(R.id.main_details_container);
 
         touchView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,7 +81,8 @@ public class WordDetailsDialog {
                 if (action.equals(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)) {
                     String reason = intent.getStringExtra(SYSTEM_DIALOG_REASON_KEY);
                     if (reason != null) {
-                        if (reason.equals(SYSTEM_DIALOG_REASON_HOME_KEY)) {
+                        if (reason.equals(SYSTEM_DIALOG_REASON_HOME_KEY) || reason.equals
+                                (SYSTEM_DIALOG_REASON_RECENT_APPS)) {
                             removeView();
                         }
                     }
@@ -96,7 +93,8 @@ public class WordDetailsDialog {
 
     public void loadWordDetails(final String word){
         progressBar.setVisibility(View.VISIBLE);
-        WordDetailsModel.getInstance().getWordDetails(context, word, new WordDetailsModel.GetDetailsListener() {
+        WordDetailsModel.getInstance().getWordDetails(context, word, new WordDetailsModel
+                .GetDetailsListener() {
 
             @Override
             public void success(WordDetails wordDetails) {
@@ -195,14 +193,14 @@ public class WordDetailsDialog {
     private void slidIn(){
         addView();
 
-        rootView.measure(View.MeasureSpec.makeMeasureSpec((1 << 30 - 1), View.MeasureSpec
+        mainDetails.measure(View.MeasureSpec.makeMeasureSpec((1 << 30 - 1), View.MeasureSpec
                 .AT_MOST), View.MeasureSpec.makeMeasureSpec((1 << 30 - 1), View.MeasureSpec
                 .AT_MOST));
 
-        Logger.w("getMeasuredHeight = " + rootView.getMeasuredHeight());
+        Logger.w("getMeasuredHeight = " + mainDetails.getMeasuredHeight());
 
         ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(rootView, "translationY",
-                contentView.getHeight(), contentView.getHeight() - rootView.getMeasuredHeight());
+                contentView.getHeight(), contentView.getHeight() - mainDetails.getMeasuredHeight());
         objectAnimator.setDuration(300);
         objectAnimator.start();
     }
