@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import com.orhanobut.logger.Logger;
 
-import spd.com.myapplication.R;
+
 import spd.com.shanbaytest.Dialog.WordDetailsDialog;
 import spd.com.shanbaytest.widget.CustomTextView;
 

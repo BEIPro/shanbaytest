@@ -11,9 +11,21 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("shanbaytest.keystore")
+            storePassword "shanbaytest,2017"
+            keyAlias "shanbaytest.keystore"
+            keyPassword "shanbaytest,2017"
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
+            zipAlignEnabled true
+            shrinkResources false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

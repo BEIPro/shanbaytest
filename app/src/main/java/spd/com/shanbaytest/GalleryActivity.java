@@ -13,7 +13,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
 
-import spd.com.myapplication.R;
 import spd.com.shanbaytest.utils.FileUtils;
 import spd.com.shanbaytest.models.Pojo.ImageDetails;
 import spd.com.shanbaytest.Adapter.GalleryRecycleViewAdapter;

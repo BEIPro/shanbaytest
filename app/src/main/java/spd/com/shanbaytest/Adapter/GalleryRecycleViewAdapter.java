@@ -8,7 +8,8 @@ import android.widget.ImageView;
 
 import java.util.List;
 
-import spd.com.myapplication.R;
+
+import spd.com.shanbaytest.R;
 import spd.com.shanbaytest.models.ImageLoader;
 import spd.com.shanbaytest.models.Pojo.ImageDetails;
 

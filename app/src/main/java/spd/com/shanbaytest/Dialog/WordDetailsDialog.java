@@ -26,7 +26,7 @@ import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
 
-import spd.com.myapplication.R;
+import spd.com.shanbaytest.R;
 import spd.com.shanbaytest.models.Pojo.WordDetails;
 import spd.com.shanbaytest.models.WordDetailsModel;
 
