@@ -2,6 +2,7 @@ package spd.com.shanbaytest.Dialog;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,8 +15,10 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.NoConnectionError;
@@ -44,9 +47,9 @@ public class WordDetailsDialog {
     private TextView msg;
     private TextView definition;
     private View touchView;
-    private WindowManager.LayoutParams params;
     private BroadcastReceiver broadcastReceiver;
     private Boolean receiverRegistered = false;
+    private ViewGroup contentView;
 
     public static WordDetailsDialog buildDialog(Context context){
 
@@ -58,7 +61,6 @@ public class WordDetailsDialog {
     private WordDetailsDialog(Context context, final View rootView) {
         this.context = context;
         this.rootView = rootView;
-
         windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         content = (TextView) rootView.findViewById(R.id.content);
         msg = (TextView) rootView.findViewById(R.id.msg);
@@ -66,6 +68,7 @@ public class WordDetailsDialog {
         definition = (TextView) rootView.findViewById(R.id.definition);
         progressBar = (ProgressBar) rootView.findViewById(R.id.prograss_bar);
         touchView = rootView.findViewById(R.id.touch_space);
+        contentView = (ViewGroup) ((Activity)context).findViewById(android.R.id.content);
 
         touchView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,18 +96,19 @@ public class WordDetailsDialog {
 
     public void loadWordDetails(final String word){
         progressBar.setVisibility(View.VISIBLE);
-        slidIn();
         WordDetailsModel.getInstance().getWordDetails(context, word, new WordDetailsModel.GetDetailsListener() {
 
             @Override
             public void success(WordDetails wordDetails) {
                 updateDetails(wordDetails);
+                slidIn();
             }
 
             @Override
             public void fail(Object fail) {
                 Logger.w(fail.toString());
                 updateDetails(fail);
+                slidIn();
             }
         });
     }
@@ -154,26 +158,14 @@ public class WordDetailsDialog {
 
     private void addView(){
 
+        if (rootView.getParent() == null){
+            contentView.addView(rootView);
+        }
+
         //检查home时间广播接收器有没有解注册
         if (!receiverRegistered){
             context.registerReceiver(broadcastReceiver, new IntentFilter(Intent
                     .ACTION_CLOSE_SYSTEM_DIALOGS));
-        }
-
-        int flag = WindowManager.LayoutParams.TYPE_TOAST;
-        if (Build.VERSION.SDK_INT < 19) {
-            flag = WindowManager.LayoutParams.TYPE_PHONE;
-        }
-        params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                flag,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                PixelFormat.TRANSLUCENT);
-        params.gravity = Gravity.BOTTOM ;
-
-        if (rootView.getWindowToken() != null){
-            return;
         }
 
         rootView.setOnKeyListener(new View.OnKeyListener() {
@@ -186,9 +178,8 @@ public class WordDetailsDialog {
                 return false;
             }
         });
-        rootView.setVisibility(View.VISIBLE);
+
         rootView.setFocusableInTouchMode(true);
-        windowManager.addView(rootView, params);
         rootView.requestFocus();
 
     }
@@ -197,20 +188,21 @@ public class WordDetailsDialog {
      */
     private void removeView(){
         if (rootView.getWindowToken() != null){
-            //先设置invisible避免闪烁
-            rootView.setVisibility(View.INVISIBLE);
-            windowManager.removeView(rootView);
-
-            if (receiverRegistered){
-                context.unregisterReceiver(broadcastReceiver);
-                receiverRegistered = false;
-            }
+            contentView.removeView(rootView);
         }
     }
 
     private void slidIn(){
         addView();
-        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(rootView, "translationY", rootView.getHeight(), 0);
+
+        rootView.measure(View.MeasureSpec.makeMeasureSpec((1 << 30 - 1), View.MeasureSpec
+                .AT_MOST), View.MeasureSpec.makeMeasureSpec((1 << 30 - 1), View.MeasureSpec
+                .AT_MOST));
+
+        Logger.w("getMeasuredHeight = " + rootView.getMeasuredHeight());
+
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(rootView, "translationY",
+                contentView.getHeight(), contentView.getHeight() - rootView.getMeasuredHeight());
         objectAnimator.setDuration(300);
         objectAnimator.start();
     }
@@ -221,7 +213,8 @@ public class WordDetailsDialog {
 
     private void slidOut(){
 
-        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(rootView, "translationY", 0, rootView.getHeight());
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(rootView, "translationY", rootView
+                .getY(), rootView.getHeight());
         objectAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {

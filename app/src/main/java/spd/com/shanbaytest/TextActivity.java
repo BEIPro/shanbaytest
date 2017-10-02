@@ -67,7 +67,7 @@ public class TextActivity extends AppCompatActivity {
         textView.setText(text, TextView.BufferType.SPANNABLE);
 
         final WordDetailsDialog detailsDialog = WordDetailsDialog
-                .buildDialog(this.getApplicationContext());
+                .buildDialog(this);
 
         textView.setSpanClickListener(new CustomTextView.SpanClickListener() {
             @Override
