@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -15,6 +16,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import java.io.IOException;
 
 import spd.com.myapplication.R;
 import spd.com.shanbaytest.models.Pojo.WordDetails;
@@ -110,7 +113,7 @@ public class WordDetailsDialogHelper {
         /**
          * word查询结果返回更新dialog
          */
-        void updateDetails(WordDetails wordDetails){
+        void updateDetails(final WordDetails wordDetails){
 
             progressBar.setVisibility(View.INVISIBLE);
             if (wordDetails.getStatus_code() == 1){
@@ -123,6 +126,22 @@ public class WordDetailsDialogHelper {
             content.setText(wordDetails.getData().getContent());
             pronunciation.setText(wordDetails.getData().getPronunciation());
             definition.setText(wordDetails.getData().getDefinition());
+
+            pronunciation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MediaPlayer mediaPlayer = new MediaPlayer();
+                    try {
+                        mediaPlayer.setDataSource(wordDetails.getData().getAudio());
+                        mediaPlayer.prepare();
+                        mediaPlayer.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+            });
 
         }
 
@@ -187,7 +206,7 @@ public class WordDetailsDialogHelper {
             addView();
         }
 
-        public void slidIn(){
+        void slidIn(){
             addView();
             ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(rootView, "translationY", rootView.getHeight(), 0);
             objectAnimator.setDuration(300);
