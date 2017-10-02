@@ -25,7 +25,7 @@ public class TextActivity extends AppCompatActivity {
                 "opportunity. But time is short,'' Stefan Fuele, the European Commissioner for " +
                 "Enlargement and European Neighbourhood Policy, said on a visit to Ukraine.\n" +
                 "Brussels put off signing the landmark agreements after a Ukrainian court jailed former " +
-                "prime minister Tymoshenko, President Viktor Yanukovich's main opponent, on an abuse- " +
+                "prime minister Tymoshenko, President Viktor Yanukovich's main opponent, on an abuse-" +
                 "of-office charge in October 2011.\n" +
                 "The EU says the Tymoshenko case and those of other prosecuted opposition politicians " +
                 "are examples of selective justice and are a barrier to Ukraine's ambition of European " +
@@ -72,6 +72,7 @@ public class TextActivity extends AppCompatActivity {
             @Override
             public void onclick(View textView, boolean clickSpace) {
 
+                Log.w("ok", "onclick clickSpace = " + clickSpace + "ok");
                 if (clickSpace){
                     detailsDialog.slidOut();
                 }else {
@@ -80,6 +81,7 @@ public class TextActivity extends AppCompatActivity {
                             .getText()
                             .subSequence(tv.getSelectionStart(),
                                     tv.getSelectionEnd()).toString();
+                    Log.w("ok", "onclick s = " + s + "ok");
                     detailsDialog.loadWordDetails(s);
                 }
             }

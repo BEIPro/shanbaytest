@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -176,16 +177,25 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
 
     /*返回字符c在字符串s中的序号数组
      *
+     * 获取string中所有的空格键序号，用来创建clickSpan
+     * 其中特殊符号替换成空格键处理保证创建的clickSpan内容不包含多余符号
      * @return 序号数组
      */
     private Integer[] getIndices(String s, char c) {
-        s.replace("\n", " ");
+        //将多余的特殊字符当做空格处理
+        s= s.replace('\n', c);
+        s= s.replace('.', c);
+        s= s.replace(',', c);
+        s= s.replace('\"', c);
+
         int pos = s.indexOf(c, 0);
         List<Integer> indices = new ArrayList<Integer>();
         while (pos != -1) {
             indices.add(pos);
             pos = s.indexOf(c, pos + 1);
         }
+
+        Log.w("ok", "s = " + s);
         return (Integer[]) indices.toArray(new Integer[0]);
     }
 
@@ -250,6 +260,7 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         int line = layout.getLineForVertical(y);
         int totalOffset = getXDrawOffset(x, line);
 
+        Log.w("ok", " totalOffset = " + totalOffset);
         //getXDrawOffset返回-1则代表点击到了空白处 返回null
         if (totalOffset == -1){
             return null;
@@ -391,9 +402,17 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         String[] strings = stringArrayList.get(line);
         int[] offsets = drawOffsetsList.get(line);
 
-        for (int i = 0; i < strings.length - 1; i++){
+        for (int i = 0; i < strings.length; i++){
 
             if ((x -= getPaint().measureText(strings[i])) > 0){
+
+                //offsets的数组长度比string少一个
+                //若x减去所有单词加空隙长度仍然大于0则说明当前点击位置为段落最后一行的空格处
+                //返回-1
+                if (i == offsets.length){
+                    offset = -1;
+                    break;
+                }
 
                 //去除一个单词的长度之后若剩余长度小于偏移量加一个空格的长度之和则说明点到了空白
                 //返回-1
