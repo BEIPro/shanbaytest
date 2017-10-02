@@ -2,12 +2,13 @@ package spd.com.shanbaytest;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.orhanobut.logger.Logger;
+
 import spd.com.myapplication.R;
-import spd.com.shanbaytest.models.WordDetailsDialogHelper;
+import spd.com.shanbaytest.Dialog.WordDetailsDialog;
 import spd.com.shanbaytest.widget.CustomTextView;
 
 public class TextActivity extends AppCompatActivity {
@@ -62,26 +63,24 @@ public class TextActivity extends AppCompatActivity {
                 "ensure transparent and competitive procedures.";
 
         final CustomTextView textView = (CustomTextView) findViewById(R.id.text);
-        Log.d("ok", "text size = " + textView.getPaint().getTextSize());
+        Logger.w("text size = " + textView.getPaint().getTextSize());
         textView.setText(text, TextView.BufferType.SPANNABLE);
 
-        final WordDetailsDialogHelper.DetailsDialog detailsDialog = WordDetailsDialogHelper
+        final WordDetailsDialog detailsDialog = WordDetailsDialog
                 .buildDialog(this.getApplicationContext());
 
         textView.setSpanClickListener(new CustomTextView.SpanClickListener() {
             @Override
             public void onclick(View textView, boolean clickSpace) {
 
-                Log.d("ok", "onclick clickSpace = " + clickSpace + "ok");
-                if (clickSpace){
-                    detailsDialog.slidOut();
-                }else {
+                if (clickSpace) {
+                    detailsDialog.dismiss();
+                } else {
                     TextView tv = (TextView) textView;
                     String s = tv
                             .getText()
                             .subSequence(tv.getSelectionStart(),
                                     tv.getSelectionEnd()).toString();
-                    Log.d("ok", "onclick s = " + s + "ok");
                     detailsDialog.loadWordDetails(s);
                 }
             }

@@ -1,4 +1,4 @@
-package spd.com.shanbaytest.widget;
+package spd.com.shanbaytest.Adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -38,7 +38,7 @@ public class GalleryRecycleViewAdapter extends RecyclerView.Adapter{
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ItemViewHolder){
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
-            imageLoader.loadImage(imageDetailsList.get(position), itemViewHolder.imageView);
+            imageLoader.loadImageInto(imageDetailsList.get(position), itemViewHolder.imageView);
         }
     }
 

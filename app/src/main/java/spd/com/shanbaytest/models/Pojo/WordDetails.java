@@ -1,7 +1,7 @@
 package spd.com.shanbaytest.models.Pojo;
 
 /**
- * Created by linus on 17-10-1.
+ * Created by joe on 17-10-1.
  */
 
 public class WordDetails {

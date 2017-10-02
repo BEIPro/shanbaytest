@@ -18,6 +18,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.orhanobut.logger.Logger;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -195,7 +197,7 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
             pos = s.indexOf(c, pos + 1);
         }
 
-        Log.d("ok", "s = " + s);
+        Logger.w("s = " + s);
         return (Integer[]) indices.toArray(new Integer[0]);
     }
 
@@ -260,7 +262,6 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         int line = layout.getLineForVertical(y);
         int totalOffset = getXDrawOffset(x, line);
 
-        Log.d("ok", " totalOffset = " + totalOffset);
         //getXDrawOffset返回-1则代表点击到了空白处 返回null
         if (totalOffset == -1){
             return null;
