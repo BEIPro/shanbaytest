@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.os.Build;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,6 +17,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.android.volley.NoConnectionError;
 
 import java.io.IOException;
 
@@ -94,18 +97,18 @@ public class WordDetailsDialogHelper {
 
         public void loadWordDetails(final String word){
             progressBar.setVisibility(View.VISIBLE);
+            slidIn();
             WordDetailsModel.getInstance().getWordDetails(context, word, new WordDetailsModel.GetDetailsListener() {
-
 
                 @Override
                 public void success(WordDetails wordDetails) {
                     updateDetails(wordDetails);
-                    slidIn();
                 }
 
                 @Override
                 public void fail(Object fail) {
-                    slidOut();
+                    Log.d("ok", fail.toString());
+                    updateDetails(fail);
                 }
             });
         }
@@ -113,38 +116,47 @@ public class WordDetailsDialogHelper {
         /**
          * word查询结果返回更新dialog
          */
-        void updateDetails(final WordDetails wordDetails){
+        void updateDetails(Object o){
 
-            progressBar.setVisibility(View.INVISIBLE);
-            if (wordDetails.getStatus_code() == 1){
-                msg.setVisibility(View.VISIBLE);
-                msg.setText(wordDetails.getMsg());
+            if (o instanceof WordDetails){
+                final WordDetails wordDetails = (WordDetails) o;
+                progressBar.setVisibility(View.INVISIBLE);
+                if (wordDetails.getStatus_code() == 1){
+                    msg.setVisibility(View.VISIBLE);
+                    msg.setText(wordDetails.getMsg());
+                    pronunciation.setVisibility(View.INVISIBLE);
+                }else {
+                    msg.setVisibility(View.INVISIBLE);
+                    pronunciation.setVisibility(View.VISIBLE);
+                    pronunciation.setText(wordDetails.getData().getPronunciation());
+                }
+
+                content.setText(wordDetails.getData().getContent());
+
+                definition.setText(wordDetails.getData().getDefinition());
+
+                pronunciation.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        MediaPlayer mediaPlayer = new MediaPlayer();
+                        try {
+                            mediaPlayer.setDataSource(wordDetails.getData().getAudio());
+                            mediaPlayer.prepare();
+                            mediaPlayer.start();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
+            }else if (o instanceof NoConnectionError){
+                progressBar.setVisibility(View.INVISIBLE);
                 pronunciation.setVisibility(View.INVISIBLE);
-            }else {
-                msg.setVisibility(View.INVISIBLE);
-                pronunciation.setVisibility(View.VISIBLE);
-                pronunciation.setText(wordDetails.getData().getPronunciation());
+                msg.setVisibility(View.VISIBLE);
+                msg.setText(R.string.no_connection);
             }
 
-            content.setText(wordDetails.getData().getContent());
-
-            definition.setText(wordDetails.getData().getDefinition());
-
-            pronunciation.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MediaPlayer mediaPlayer = new MediaPlayer();
-                    try {
-                        mediaPlayer.setDataSource(wordDetails.getData().getAudio());
-                        mediaPlayer.prepare();
-                        mediaPlayer.start();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }
-            });
 
         }
 
@@ -186,6 +198,7 @@ public class WordDetailsDialogHelper {
             rootView.setVisibility(View.VISIBLE);
             rootView.setFocusableInTouchMode(true);
             windowManager.addView(rootView, params);
+            Log.d("ok", "add view");
             rootView.requestFocus();
 
         }

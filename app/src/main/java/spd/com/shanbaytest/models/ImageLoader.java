@@ -14,9 +14,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.ResponseBody;
+import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.http.GET;
@@ -37,6 +40,7 @@ import spd.com.shanbaytest.models.Pojo.ImageDetails;
 
 public class ImageLoader {
 
+    private List<String> notTryList = new ArrayList<>();
     private ImageLoader() {
 
     }
@@ -80,14 +84,16 @@ public class ImageLoader {
     private void loadImageFromNetwork(final ImageDetails imageDetails, final ImageView imageView) {
         String[] strings = imageDetails.getUrl().split("/");
         final String fileName = strings[strings.length - 1];
-        Log.w("ok", "filename = " + fileName);
+        Log.d("ok", "filename = " + fileName);
         getService().downloadPicFromNet(fileName).subscribeOn(Schedulers.newThread())
                 //重试3次，时间为1000ms,2000ms,3000ms
-                .retryWhen(new RetryWithDelay(3, 1000))
+                //重试3次失败之后不再重试
+                .retryWhen(notTryList.contains(imageDetails.getUrl())?
+                        new RetryWithDelay(0, 0) : new RetryWithDelay(3, 1000))
                 .map(new Func1<ResponseBody, Boolean>() {
                     @Override
                     public Boolean call(ResponseBody responseBody) {
-                        Log.w("ok", "download response");
+                        Log.d("ok", "download response");
                         Boolean writeSuccess = writeResponseBodyToDisk(imageView.getContext(),
                                 responseBody, imageDetails.getUrl());
                         if (writeSuccess) {
@@ -101,12 +107,22 @@ public class ImageLoader {
                 .subscribe(new Subscriber<Boolean>() {
                     @Override
                     public void onCompleted() {
-                        Log.w("ok", "download response onCompleted");
+                        Log.d("ok", "download response onCompleted");
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.w("ok", "download response onError");
+
+                        if (e instanceof HttpException){
+                            if (((HttpException) e).response().code() == 404) {
+                                if (!notTryList.contains(imageDetails.getUrl())){
+                                    notTryList.add(imageDetails.getUrl());
+                                }
+
+                            }
+                        }
+
+                        Log.d("ok", "download response onError");
                         Glide.with(imageView.getContext()).load(R.mipmap
                                 .f82e4bbb12978195797a3447d80f50ff).override(400, 720).into
                                 (imageView);
@@ -115,7 +131,7 @@ public class ImageLoader {
 
                     @Override
                     public void onNext(Boolean writeSuccess) {
-                        Log.w("ok", "writeSuccess = " + writeSuccess);
+                        Log.d("ok", "writeSuccess = " + writeSuccess);
                         Glide.with(imageView.getContext()).load(imageDetails.getLocalPath())
                                 .override(400, 720).error(R.mipmap
                                 .f82e4bbb12978195797a3447d80f50ff).listener(new RequestListener<String, GlideDrawable>() {
@@ -126,7 +142,7 @@ public class ImageLoader {
                                                        Target<GlideDrawable> target, boolean
                                                                isFirstResource) {
                                 e.printStackTrace();
-                                Log.w("ok", "glide onException");
+                                Log.d("ok", "glide onException");
                                 return false;
                             }
 
@@ -135,7 +151,7 @@ public class ImageLoader {
                                                            Target<GlideDrawable> target, boolean
                                                                    isFromMemoryCache, boolean
                                                                    isFirstResource) {
-                                Log.w("ok", "glide onResourceReady");
+                                Log.d("ok", "glide onResourceReady");
                                 return false;
                             }
                         }).override(400, 720).into(imageView);
@@ -250,7 +266,7 @@ public class ImageLoader {
                             if (++retryCount <= maxRetries) {
                                 // When this Observable calls onNext, the original Observable
                                 // will be retried (i.e. re-subscribed).
-                                Log.w("ok", "get error, it will try after " + retryDelayMillis * retryCount
+                                Log.d("ok", "get error, it will try after " + retryDelayMillis * retryCount
                                         + " millisecond, retry count " + retryCount);
                                 return Observable.timer(retryDelayMillis * retryCount,
                                         TimeUnit.MILLISECONDS);

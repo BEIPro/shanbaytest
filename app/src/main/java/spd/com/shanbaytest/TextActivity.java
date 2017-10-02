@@ -62,7 +62,7 @@ public class TextActivity extends AppCompatActivity {
                 "ensure transparent and competitive procedures.";
 
         final CustomTextView textView = (CustomTextView) findViewById(R.id.text);
-        Log.w("ok", "text size = " + textView.getPaint().getTextSize());
+        Log.d("ok", "text size = " + textView.getPaint().getTextSize());
         textView.setText(text, TextView.BufferType.SPANNABLE);
 
         final WordDetailsDialogHelper.DetailsDialog detailsDialog = WordDetailsDialogHelper
@@ -72,7 +72,7 @@ public class TextActivity extends AppCompatActivity {
             @Override
             public void onclick(View textView, boolean clickSpace) {
 
-                Log.w("ok", "onclick clickSpace = " + clickSpace + "ok");
+                Log.d("ok", "onclick clickSpace = " + clickSpace + "ok");
                 if (clickSpace){
                     detailsDialog.slidOut();
                 }else {
@@ -81,7 +81,7 @@ public class TextActivity extends AppCompatActivity {
                             .getText()
                             .subSequence(tv.getSelectionStart(),
                                     tv.getSelectionEnd()).toString();
-                    Log.w("ok", "onclick s = " + s + "ok");
+                    Log.d("ok", "onclick s = " + s + "ok");
                     detailsDialog.loadWordDetails(s);
                 }
             }
