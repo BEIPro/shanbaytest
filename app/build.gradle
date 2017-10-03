@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyyMMddHHmm')
+    return formattedDate
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -27,6 +33,25 @@ android {
             shrinkResources false
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def oldFile = output.outputFile
+            def projectName = 'ShanBay_v';
+            if (variant.buildType.name.equals('release')) {
+                def releaseApkName = projectName + variant.productFlavors[0].versionName +
+                        '_' + variant.productFlavors[0].name + '_release' + "_" + getDate() + '.apk'
+                output.outputFile = new File(oldFile.parent, releaseApkName)
+            }
+        }
+    }
+
+    productFlavors {
+        shan_bay_test {
+            versionCode 1
+            versionName "1.0.0"
         }
     }
 }

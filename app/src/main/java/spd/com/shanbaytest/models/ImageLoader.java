@@ -1,4 +1,5 @@
 package spd.com.shanbaytest.models;
+import android.util.DisplayMetrics;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -32,7 +33,6 @@ public class ImageLoader {
 
     private List<String> notTryList = new ArrayList<>();
     private ImageLoader() {
-
     }
 
     public static ImageLoader newInstance() {
@@ -44,7 +44,11 @@ public class ImageLoader {
      * 本地没有则通过网络下载
      */
     public void loadImageInto(final ImageDetails imageDetails, final ImageView imageView) {
-        Glide.with(imageView.getContext()).load(imageDetails.getLocalPath()).override(400, 720)
+        DisplayMetrics dm = imageView.getContext().getResources().getDisplayMetrics();
+        int imgLoadWidth = dm.widthPixels/2;
+        int imgLoadHeight = dm.heightPixels*2/3;
+
+        Glide.with(imageView.getContext()).load(imageDetails.getLocalPath()).override(imgLoadWidth, imgLoadHeight)
                 .listener(new RequestListener<String, GlideDrawable>() {
             @Override
             public boolean onException(Exception e, String model, Target<GlideDrawable> target,
@@ -71,6 +75,10 @@ public class ImageLoader {
      * @param imageView　用于更新的imageView
      */
     private void loadImageFromNetworkInto(final ImageDetails imageDetails, final ImageView imageView) {
+        DisplayMetrics dm = imageView.getContext().getResources().getDisplayMetrics();
+        final int imgLoadWidth = dm.widthPixels/2;
+        final int imgLoadHeight = dm.heightPixels*2/3;
+
         String[] strings = imageDetails.getUrl().split("/");
         final String fileName = strings[strings.length - 1];
         Logger.w("filename = " + fileName);
@@ -115,7 +123,7 @@ public class ImageLoader {
 
                         Logger.w("download response onError");
                         Glide.with(imageView.getContext()).load(R.mipmap
-                                .f82e4bbb12978195797a3447d80f50ff).override(400, 720).into
+                                .f82e4bbb12978195797a3447d80f50ff).override(imgLoadWidth, imgLoadHeight).into
                                 (imageView);
                         e.printStackTrace();
                     }
@@ -124,7 +132,7 @@ public class ImageLoader {
                     public void onNext(Boolean writeSuccess) {
                         Logger.w("writeSuccess = " + writeSuccess);
                         Glide.with(imageView.getContext()).load(imageDetails.getLocalPath())
-                                .override(400, 720).error(R.mipmap
+                                .override(imgLoadWidth, imgLoadHeight).error(R.mipmap
                                 .f82e4bbb12978195797a3447d80f50ff).listener(new RequestListener<String, GlideDrawable>() {
 
                             @Override
