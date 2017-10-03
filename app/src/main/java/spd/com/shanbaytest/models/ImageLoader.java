@@ -152,7 +152,7 @@ public class ImageLoader {
                                 Logger.w("glide onResourceReady");
                                 return false;
                             }
-                        }).override(imgLoadWidth, imgLoadHeight).into(imageView);
+                        }).into(imageView);
                     }
                 });
     }
