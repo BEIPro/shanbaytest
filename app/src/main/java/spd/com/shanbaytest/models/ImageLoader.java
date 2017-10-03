@@ -173,15 +173,13 @@ public class ImageLoader {
                         @Override
                         public Observable<?> call(Throwable throwable) {
                             if (++retryCount <= maxRetries) {
-                                // When this Observable calls onNext, the original Observable
-                                // will be retried (i.e. re-subscribed).
+
                                 Logger.w("get error, it will try after " + retryDelayMillis * retryCount
                                         + " millisecond, retry count " + retryCount);
                                 return Observable.timer(retryDelayMillis * retryCount,
                                         TimeUnit.MILLISECONDS);
                             }
 
-                            // Max retries hit. Just pass the error along.
                             return Observable.error(throwable);
                         }
                     });

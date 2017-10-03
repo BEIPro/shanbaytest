@@ -185,10 +185,16 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
      */
     private Integer[] getIndices(String s, char c) {
         //将多余的特殊字符当做空格处理
-        s= s.replace('\n', c);
-        s= s.replace('.', c);
-        s= s.replace(',', c);
-        s= s.replace('\"', c);
+        //通过ascii码对应特殊字符
+        for (int i = 33 ; i <= 47; i++){
+            s = s.replace((char)i, c);
+        }
+        for (int i = 91 ; i <= 96; i++){
+            s = s.replace((char)i, c);
+        }
+        for (int i = 123 ; i < 126; i++){
+            s = s.replace((char)i, c);
+        }
 
         int pos = s.indexOf(c, 0);
         List<Integer> indices = new ArrayList<Integer>();

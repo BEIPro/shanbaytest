@@ -90,7 +90,6 @@ public class WordDetailsDialog {
         if (context instanceof AppCompatActivity){
             android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) context)
                     .getSupportActionBar();
-            Logger.w("actionBar = " + actionBar);
             if (actionBar != null){
                 if(actionBar.isShowing()){
                     TypedValue tv = new TypedValue();
@@ -103,7 +102,6 @@ public class WordDetailsDialog {
             }
         }else{
             ActionBar actionBar = ((Activity)context).getActionBar();
-            Logger.w("actionBar = " + actionBar);
             if (actionBar != null){
                 if(actionBar.isShowing()){
                     TypedValue tv = new TypedValue();
@@ -249,7 +247,7 @@ public class WordDetailsDialog {
         }
     }
 
-    /*从屏幕下方划入
+    /*从屏幕下方滑入
      */
     private void slidIn(){
         addView();
@@ -372,7 +370,7 @@ public class WordDetailsDialog {
                                     actionBarHeight  > firstPointY){
                                 slidOut();
                             } else {
-                                //位于屏幕中部的时候(view初始停留位置上方48dp以内)
+                                //位于屏幕中部的时候(view初始停留位置上方48dp以内)，滑回初始位置
                                 slidTo(firstPointY);
                             }
                         }
