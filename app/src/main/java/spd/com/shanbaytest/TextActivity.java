@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 
-import spd.com.shanbaytest.Dialog.WordDetailsDialog;
+import spd.com.shanbaytest.dialog.WordDetailsDialog;
 import spd.com.shanbaytest.widget.CustomTextView;
 
 public class TextActivity extends AppCompatActivity {

@@ -15,7 +15,7 @@ import java.util.List;
 
 import spd.com.shanbaytest.utils.FileUtils;
 import spd.com.shanbaytest.models.Bean.ImageDetails;
-import spd.com.shanbaytest.Adapter.GalleryRecycleViewAdapter;
+import spd.com.shanbaytest.adapter.GalleryRecycleViewAdapter;
 
 /**
  * Created by linus on 17-10-1.

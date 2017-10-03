@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">For ShanBay</string>
     <string name="no_connection">No connection</string>
     <string name="text_activity_label">TextActivity</string>
     <string name="gallery_activity_label">GalleryActivity</string>

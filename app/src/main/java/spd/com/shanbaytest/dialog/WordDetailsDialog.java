@@ -1,4 +1,4 @@
-package spd.com.shanbaytest.Dialog;
+package spd.com.shanbaytest.dialog;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
