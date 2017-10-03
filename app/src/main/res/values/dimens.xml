@@ -1,4 +1,7 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="waterfall_item_margin">2dp</dimen>
+    <dimen name="recycle_item_decoration">2dp</dimen>
+
+    <dimen name="top_stop_margin">16dp</dimen>
+    <dimen name="top_extend_length">48dp</dimen>
 </resources>

@@ -14,7 +14,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.List;
 
 import spd.com.shanbaytest.utils.FileUtils;
-import spd.com.shanbaytest.models.Pojo.ImageDetails;
+import spd.com.shanbaytest.models.Bean.ImageDetails;
 import spd.com.shanbaytest.Adapter.GalleryRecycleViewAdapter;
 
 /**
@@ -58,7 +58,7 @@ public class GalleryActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.gallery);
 
         recyclerView.addItemDecoration(new SpacesItemDecoration(
-                getResources().getDimensionPixelSize(R.dimen.waterfall_item_margin)));
+                getResources().getDimensionPixelSize(R.dimen.recycle_item_decoration)));
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(galleryRecycleViewAdapter);
 

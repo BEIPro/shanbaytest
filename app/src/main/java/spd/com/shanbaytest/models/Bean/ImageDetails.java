@@ -1,4 +1,4 @@
-package spd.com.shanbaytest.models.Pojo;
+package spd.com.shanbaytest.models.Bean;
 
 /**
  * Created by joe on 17-10-1.

@@ -25,12 +25,16 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="spd.com.shanbaytest.TextActivity"
-                  android:screenOrientation="portrait">
+        <activity
+            android:label="@string/text_activity_label"
+            android:name="spd.com.shanbaytest.TextActivity"
+            android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name="spd.com.shanbaytest.GalleryActivity"
-                  android:screenOrientation="portrait">
+        <activity
+            android:name="spd.com.shanbaytest.GalleryActivity"
+            android:label="@string/gallery_activity_label"
+            android:screenOrientation="portrait">
         </activity>
 
     </application>

@@ -21,7 +21,7 @@ import rx.schedulers.Schedulers;
 
 import spd.com.shanbaytest.R;
 import spd.com.shanbaytest.utils.FileUtils;
-import spd.com.shanbaytest.models.Pojo.ImageDetails;
+import spd.com.shanbaytest.models.Bean.ImageDetails;
 import spd.com.shanbaytest.utils.RetrofitServiceUtils;
 
 /**
@@ -36,9 +36,9 @@ public class ImageLoader {
     }
 
     public static ImageLoader newInstance() {
-
         return new ImageLoader();
     }
+
     /**
      * 通过glide先试图本地图片加载
      * 本地没有则通过网络下载
@@ -84,6 +84,7 @@ public class ImageLoader {
                     @Override
                     public Boolean call(ResponseBody responseBody) {
                         Logger.w("download response");
+                        //从网络获取资源则成功写入sd卡
                         Boolean writeSuccess = FileUtils.writeResponseBodyToDisk(imageView.getContext(),
                                 responseBody, imageDetails.getUrl());
                         if (writeSuccess) {
@@ -103,6 +104,7 @@ public class ImageLoader {
                     @Override
                     public void onError(Throwable e) {
                         if (e instanceof HttpException){
+                            //三次重试都失败，则本生命周期内不再尝试加载
                             if (((HttpException) e).response().code() == 404) {
                                 if (!notTryList.contains(imageDetails.getUrl())){
                                     notTryList.add(imageDetails.getUrl());

@@ -27,7 +27,8 @@ public class RetrofitServiceUtils {
     public static ServiceApi getService(String baseUrl){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create()) //添加Rxjava
+                //添加Rxjava
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
         return retrofit.create(ServiceApi.class);
     }
