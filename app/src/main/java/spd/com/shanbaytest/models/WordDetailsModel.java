@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
-import spd.com.shanbaytest.models.Bean.WordDetails;
+import spd.com.shanbaytest.models.bean.WordDetails;
 
 /**
  * Created by linus on 17-9-30.

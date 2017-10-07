@@ -28,7 +28,7 @@ import com.orhanobut.logger.Logger;
 import java.io.IOException;
 
 import spd.com.shanbaytest.R;
-import spd.com.shanbaytest.models.Bean.WordDetails;
+import spd.com.shanbaytest.models.bean.WordDetails;
 import spd.com.shanbaytest.models.WordDetailsModel;
 
 /**

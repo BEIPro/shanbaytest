@@ -22,7 +22,7 @@ import rx.schedulers.Schedulers;
 
 import spd.com.shanbaytest.R;
 import spd.com.shanbaytest.utils.FileUtils;
-import spd.com.shanbaytest.models.Bean.ImageDetails;
+import spd.com.shanbaytest.models.bean.ImageDetails;
 import spd.com.shanbaytest.utils.RetrofitServiceUtils;
 
 /**

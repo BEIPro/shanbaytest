@@ -14,7 +14,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.List;
 
 import spd.com.shanbaytest.utils.FileUtils;
-import spd.com.shanbaytest.models.Bean.ImageDetails;
+import spd.com.shanbaytest.models.bean.ImageDetails;
 import spd.com.shanbaytest.adapter.GalleryRecycleViewAdapter;
 
 /**
